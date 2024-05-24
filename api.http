@@ -66,7 +66,7 @@ POST {{gateway_host}}/api/rolls
 content-type: application/json
 x-ms-client-principal: {{client_principal}}
 
-{ "count": 10 }
+{ "count": 50 }
 
 ###
 
