@@ -18,11 +18,12 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "docker:setup":"npm run docker:build && npm run docker:run",
-    "docker:build":"docker build --tag dice-api --file ./Dockerfile ../..",
-    "docker:run":"docker run --rm --publish 4002:4002 dice-api"
+    "docker:setup": "npm run docker:build && npm run docker:run",
+    "docker:build": "docker build --tag dice-api --file ./Dockerfile ../..",
+    "docker:run": "docker run --rm --publish 4002:4002 dice-api"
   },
   "dependencies": {
+    "@azure/cosmos": "^4.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",

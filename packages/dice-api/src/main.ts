@@ -8,4 +8,3 @@ async function bootstrap() {
   await app.listen(4002);
 }
 bootstrap();
-
