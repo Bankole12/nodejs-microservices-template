@@ -18,40 +18,43 @@ echo "$REGISTRY_PASSWORD" | docker login \
 
 echo "Deploying settings-api..."
 docker image tag settings-api "$REGISTRY_NAME.azurecr.io/settings-api:$commit_sha"
-docker image push "$REGISTRY_SERVER/settings-api:$commit_sha"
+docker image push "$REGISTRY_NAME.azurecr.io/settings-api:$commit_sha"
 
+# Set secret for settings-api
 az containerapp secret set \
   --name "${CONTAINER_APP_NAMES[0]}" \
   --resource-group "$RESOURCE_GROUP_NAME" \
-  --secrets DB_CONNECTION_STRING="$DATABASE_CONNECTION_STRING" \
+  --secrets db-connection-string="$DATABASE_CONNECTION_STRING" \
   --output tsv
 
-echo "Updating settings api"
+# Update settings-api container app
 az containerapp update \
   --name "${CONTAINER_APP_NAMES[0]}" \
   --resource-group "$RESOURCE_GROUP_NAME" \
-  --image "$REGISTRY_SERVER/settings-api:$commit_sha" \
+  --image "$REGISTRY_NAME.azurecr.io/settings-api:$commit_sha" \
   --set-env-vars \
-    DATABASE_CONNECTION_STRING="secretref:DB_CONNECTION_STRING" \
+    DATABASE_CONNECTION_STRING="secretref:db-connection-string" \
   --query "properties.configuration.ingress.fqdn" \
   --output tsv
 
 echo "Deploying dice-api..."
 docker image tag dice-api "$REGISTRY_NAME.azurecr.io/dice-api:$commit_sha"
-docker image push "$REGISTRY_SERVER/dice-api:$commit_sha"
+docker image push "$REGISTRY_NAME.azurecr.io/dice-api:$commit_sha"
 
+# Set secret for dice-api
 az containerapp secret set \
   --name "${CONTAINER_APP_NAMES[1]}" \
   --resource-group "$RESOURCE_GROUP_NAME" \
-  --secrets DB_CONNECTION_STRING="$DATABASE_CONNECTION_STRING" \
+  --secrets db-connection-string="$DATABASE_CONNECTION_STRING" \
   --output tsv
 
+# Update dice-api container app
 az containerapp update \
   --name "${CONTAINER_APP_NAMES[1]}" \
   --resource-group "$RESOURCE_GROUP_NAME" \
-  --image "$REGISTRY_SERVER/dice-api:$commit_sha" \
+  --image "$REGISTRY_NAME.azurecr.io/dice-api:$commit_sha" \
   --set-env-vars \
-    DATABASE_CONNECTION_STRING="$DATABASE_CONNECTION_STRING" \
+    DATABASE_CONNECTION_STRING="secretref:db-connection-string" \
   --scale-rule-name http-rule \
   --scale-rule-type http \
   --scale-rule-http-concurrency 100 \
@@ -60,12 +63,13 @@ az containerapp update \
 
 echo "Deploying gateway-api..."
 docker image tag gateway-api "$REGISTRY_NAME.azurecr.io/gateway-api:$commit_sha"
-docker image push "$REGISTRY_SERVER/gateway-api:$commit_sha"
+docker image push "$REGISTRY_NAME.azurecr.io/gateway-api:$commit_sha"
 
+# Update gateway-api container app
 az containerapp update \
   --name "${CONTAINER_APP_NAMES[2]}" \
   --resource-group "$RESOURCE_GROUP_NAME" \
-  --image "$REGISTRY_SERVER/gateway-api:$commit_sha" \
+  --image "$REGISTRY_NAME.azurecr.io/gateway-api:$commit_sha" \
   --set-env-vars \
     SETTINGS_API_URL="https://${CONTAINER_APP_HOSTNAMES[0]}" \
     DICE_API_URL="https://${CONTAINER_APP_HOSTNAMES[1]}" \
@@ -81,4 +85,3 @@ npx swa deploy \
   --deployment-token "${STATIC_WEB_APP_DEPLOYMENT_TOKENS[0]}" \
   --env "production" \
   --verbose
-
