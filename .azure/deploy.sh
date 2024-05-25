@@ -26,6 +26,7 @@ az containerapp secret set \
   --secrets DB_CONNECTION_STRING="$DATABASE_CONNECTION_STRING" \
   --output tsv
 
+echo "Updating settings api"
 az containerapp update \
   --name "${CONTAINER_APP_NAMES[0]}" \
   --resource-group "$RESOURCE_GROUP_NAME" \
