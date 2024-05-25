@@ -34,13 +34,21 @@ var kind = type == 'MongoDB' ? 'MongoDB' : 'GlobalDocumentDB'
 // TODO: tier: free, serverless, standard
 
 // ---------------------------------------------------------------------------
+var maxLengthProjectName = 20
+var maxLengthEnvironment = 6
+var maxLengthUid = 10
 
-var uid = uniqueString(resourceGroup().id, projectName, environment, location)
+var shortProjectName = length(projectName) > maxLengthProjectName ? substring(projectName, 0, maxLengthProjectName) : projectName
+var shortEnvironment = length(environment) > maxLengthEnvironment ? substring(environment, 0, maxLengthEnvironment) : environment
+var uid = substring(uniqueString(resourceGroup().id, projectName, environment, location), 0, maxLengthUid)
+
+// Construct the name ensuring it doesn't exceed 50 characters
+var cosmosDbName = 'db-${shortProjectName}-${shortEnvironment}-${uid}'
 
 // Azure Cosmos DB
 // https://learn.microsoft.com/azure/templates/microsoft.documentdb/databaseaccounts?pivots=deployment-language-bicep
 resource cosmosDb 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
-  name: 'db-${projectName}-${environment}-${uid}'
+  name: cosmosDbName
   location: location
   tags: tags
   kind: kind

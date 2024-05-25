@@ -14,7 +14,6 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@azure/static-web-apps-cli": "^1.1.8",
     "concurrently": "^7.6.0"
   }
 }
